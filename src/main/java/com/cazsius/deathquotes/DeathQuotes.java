@@ -25,7 +25,6 @@ public class DeathQuotes {
     public static String[] quotes = null;
 
     public static final String ID = "deathquotes";
-    public static final String NAME = "Death Quotes";
 
 
     public static MinecraftServer server = null; // needed by a function in Do.
@@ -33,7 +32,6 @@ public class DeathQuotes {
     public static String theNewLine = "\n";
 
     public DeathQuotes() {
-        ModLoadingContext modLoadingContext = ModLoadingContext.get();
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
 
@@ -45,11 +43,11 @@ public class DeathQuotes {
 
         // if no quotes file in config folder create the default from the one in the jar file assets folder
         if (! Do.fileExists(quotesPathAndFileName) )
-        { String output = "";
+        { StringBuilder output = new StringBuilder();
             BufferedReader readBuffer = null;
             String aLine = "";
-            Boolean addWithNewline = false;
-            Boolean readingLines = true;
+            boolean addWithNewline = false;
+            boolean readingLines = true;
             try { readBuffer = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream("assets/"+quotesFileName), "UTF-8")); } // open the input stream
             catch (UnsupportedEncodingException e1) { readingLines = false; Do.Err("The file "+ quotesFileName + " seems to be missing in the jar file and the config folder."); }
             while ( readingLines ) {
@@ -57,13 +55,13 @@ public class DeathQuotes {
                 aLine = readTextLine(readBuffer); // read the next line
                 if ( aLine != null )
                 {	if (! aLine.matches("^\\s*$") ) { // if it is not a blank line
-                    if (addWithNewline) { output += theNewLine; } else { addWithNewline = true; } // prevents a blank line at end of the output file
-                    output += aLine;
+                    if (addWithNewline) { output.append(theNewLine); } else { addWithNewline = true; } // prevents a blank line at end of the output file
+                    output.append(aLine);
                 }
                 } else { readingLines = false; } // null means nothing more to read
             } // end while read loop
-            if ( output.length() > 0 ) { Do.StringToFile(quotesPathAndFileName, output); }
-            output="";
+            if ( output.length() > 0 ) { Do.StringToFile(quotesPathAndFileName, output.toString()); }
+            output = new StringBuilder();
             try { readBuffer.close(); } catch (IOException e1) {}
         } // end create the default quotes file
 
@@ -85,7 +83,7 @@ public class DeathQuotes {
         boolean endOfFile = false;
         boolean didReadSomething = false;
         boolean readingChars = true;
-        String outputString = "";
+        StringBuilder outputString = new StringBuilder();
         int aCharInt = -1;
         while ( readingChars ) {
             try {
@@ -97,7 +95,7 @@ public class DeathQuotes {
             if  ( aCharInt == -1 )       { endOfFile=true; readingChars = false; }
             if (( aCharInt == 10 ) || ( aCharInt == 13)) { readingChars = false; } //  \n or \r
             //if (( aCharInt == 8216 ) || ( aCharInt == 8217 )) { aCharInt = 39; } // custom code for compatibility
-            if (( aCharInt != -1 ) && ( aCharInt != 10) && ( aCharInt != 13 )) { outputString += (char) aCharInt; }
+            if (( aCharInt != -1 ) && ( aCharInt != 10) && ( aCharInt != 13 )) { outputString.append((char) aCharInt); }
         }
 
         // Compatibility with \r\n (0D0A hex) from windows text editors:
@@ -109,7 +107,7 @@ public class DeathQuotes {
         }
 
         if (( endOfFile ) && ( ! didReadSomething )) { return null; }
-        return outputString;
+        return outputString.toString();
     }
 
     @SubscribeEvent

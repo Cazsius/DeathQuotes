@@ -45,8 +45,5 @@ public class ForgeHooks {
         }
         StringTextComponent broadcastMessage = new StringTextComponent("\"" + DeathQuotes.quotes[n] + "\"");
         player.getServer().getPlayerList().sendMessage(broadcastMessage);
-        return;
     }
-
-
 }
